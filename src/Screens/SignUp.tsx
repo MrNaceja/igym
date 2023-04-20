@@ -5,7 +5,7 @@ import Logo from '../components/Logo'
 import Input from '../components/Input'
 import Button from '../components/Button'
 
-export default function SignIn() {
+export default function SignUp() {
     return (
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
             <VStack flex={1} justifyContent="space-between" p="5">
@@ -24,8 +24,11 @@ export default function SignIn() {
 
                 <VStack space="5" my="5">
                     <Heading color="gray.300" textAlign="center">
-                        Acesse sua conta
+                        Crie sua conta
                     </Heading>
+                    <Input 
+                        placeholder='diga seu nome'
+                    />
                     <Input 
                         placeholder='seu melhor e-mail'
                         keyboardType='email-address'
@@ -35,12 +38,12 @@ export default function SignIn() {
                         placeholder='uma boa senha'
                         secureTextEntry
                     />
-                    <Button text="Acessar" />
+                    <Button text="Criar minha conta" />
                 </VStack>
 
                 <VStack space="5">
-                    <Text color="gray.300" textAlign="center">Ainda não tem uma conta?</Text>
-                    <Button text="Criar uma conta" variant="outline" />
+                    <Text color="gray.300" textAlign="center">Já tem uma conta?</Text>
+                    <Button text="Voltar e acessar" variant="outline" />
                 </VStack>
             </VStack>
         </ScrollView>

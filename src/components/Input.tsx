@@ -8,7 +8,9 @@ export default function Input({...inputNativeProps} : IInputProps) {
         px="4"
         fontSize="md"
         borderColor="transparent"
+        placeholderTextColor="gray.500"
         borderWidth="2"
+        rounded="sm"
         _focus={{bg: "gray.900", borderColor: "indigo.500"}}
         {...inputNativeProps}
     />
