@@ -4,13 +4,19 @@ import GymBackground from '../assets/bg_gym.png'
 import Logo from '../components/Logo'
 import Input from '../components/Input'
 import Button from '../components/Button'
+import { TAuthRoutes } from '../routes/auth.routes'
+import { NativeStackScreenProps } from '@react-navigation/native-stack/lib/typescript/src/types'
 
-export default function SignIn() {
+export default function SignIn({ navigation } : NativeStackScreenProps<TAuthRoutes, "SIGN_IN_ROUTE">) {
+
+    const onPressGoToSignUp = () => navigation.navigate("SIGN_UP_ROUTE")
+
     return (
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
             <VStack flex={1} justifyContent="space-between" p="5">
                 <Image 
                     source={GymBackground}
+                    defaultSource={GymBackground}
                     alt="Treinando musculação"
                     resizeMode="contain"
                     position="absolute"
@@ -40,7 +46,7 @@ export default function SignIn() {
 
                 <VStack space="5">
                     <Text color="gray.300" textAlign="center">Ainda não tem uma conta?</Text>
-                    <Button text="Criar uma conta" variant="outline" />
+                    <Button text="Criar uma conta" variant="outline" onPress={onPressGoToSignUp}/>
                 </VStack>
             </VStack>
         </ScrollView>

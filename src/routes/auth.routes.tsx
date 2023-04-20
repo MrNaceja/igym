@@ -2,7 +2,7 @@ import { NativeStackNavigationProp, createNativeStackNavigator } from "@react-na
 import SignIn from "../Screens/SignIn"
 import SignUp from "../Screens/SignUp"
 
-type TAuthRoutes = {
+export type TAuthRoutes = {
     SIGN_IN_ROUTE: undefined,
     SIGN_UP_ROUTE: undefined
 } 
@@ -13,7 +13,7 @@ const { Navigator, Screen } = createNativeStackNavigator<TAuthRoutes>()
 export default function AuthRoutes() {
     return (
         <Navigator initialRouteName="SIGN_IN_ROUTE" screenOptions={{
-            animation: "slide_from_left",
+            animation: "slide_from_right",
             headerShown: false
         }}>
             <Screen 
