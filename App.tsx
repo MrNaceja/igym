@@ -11,6 +11,7 @@ export default function App() {
     <NativeBaseProvider>
       <StatusBar 
         style="light"
+        translucent
       />
       {!fontLoaded ? <Loading /> : <Routes />}
     </NativeBaseProvider>
