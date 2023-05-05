@@ -5,8 +5,14 @@ import { MaterialIcons } from '@expo/vector-icons'
 
 export default function HeaderHome() {
     return (
-        <HStack bg="gray.800" pt="16" pb="5" px="5" alignItems="center" justifyContent="space-between">
-            
+        <HStack 
+            bg="gray.800"
+            pt="16" 
+            pb="5" 
+            px="5" 
+            alignItems="center" 
+            justifyContent="space-between"
+        >
             <HStack space="4" alignItems="center">
                 <UserAvatar 
                     source={{ uri: 'https://github.com/MrNaceja.png' }}
