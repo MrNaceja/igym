@@ -33,7 +33,6 @@ export default function HeaderHome() {
                     size="md"
                 />
             </TouchableOpacity>
-
         </HStack>
     )
 }
