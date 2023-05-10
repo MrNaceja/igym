@@ -16,7 +16,7 @@ export default function History() {
     ]
     return (
         <VStack flex={1} space="2">
-            <HeaderScreen title="Histórico de Atividades"/>
+            <HeaderScreen title="Histórico de Atividades" description="Veja o histórico dos exercicios praticads"/>
             <SectionList 
                 sections={sectionData}
                 keyExtractor={item => item.toString()}

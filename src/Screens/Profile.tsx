@@ -7,7 +7,7 @@ import Button from "../components/Button";
 export default function Profile() {
     return (
         <VStack flex={1}>
-            <HeaderScreen title="Meu Perfil"/>
+            <HeaderScreen title="Meu Perfil" description="Visualize e atualize informações do seu perfil"/>
             <ScrollView  _contentContainerStyle={{ p: "5", gap: 5 } as Partial<IScrollViewProps>}>
                 <VStack space="2" alignItems="center" px="24">
                     <UserAvatar 
