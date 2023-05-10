@@ -13,7 +13,7 @@ export default function Routes() {
 
     return (
         <NavigationContainer theme={navigationTheme}>
-            <SignedRoutes />
+            <AuthRoutes />
         </NavigationContainer>
     )
 }
