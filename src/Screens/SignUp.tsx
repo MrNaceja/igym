@@ -1,4 +1,4 @@
-import { VStack, Image, Center, Text, Heading, ScrollView } from 'native-base'
+import { VStack, Image, Center, Text, Heading, ScrollView, useToast } from 'native-base'
 
 import GymBackground from '../assets/bg_gym.png'
 import Logo from '../components/Logo'
@@ -15,13 +15,25 @@ type TFormData = {
 }
 
 export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoutes, "SIGN_UP_ROUTE">) {
-
+    const toast = useToast()
     const { control, handleSubmit, formState: { errors } } = useForm<TFormData>()
 
     const onPressBackToSignIn = () => navigation.goBack()
 
     function onPressSignUp({ name, email, password } : TFormData) {
-
+        fetch('http://192.168.1.2:3333/users', {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, email, password })
+        }).catch(err => {
+            toast.show({
+                title: 'Ops não foi possível criar sua conta',
+                bg:'red.500'
+            })
+        })
     }
 
     return (
@@ -64,11 +76,7 @@ export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoute
                         control={control}
                         name="email"
                         rules={{
-                            required: "Ops, precisamos do seu e-mail",
-                            pattern: {
-                                value: /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i,
-                                message: "Ops, este e-mail não é válido"
-                            }
+                            required: "Ops, precisamos do seu e-mail"
                         }}
                         render={({ field: { onChange, value } }) => (
                             <Input
