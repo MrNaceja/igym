@@ -7,6 +7,8 @@ import Button from '../components/Button'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { TAuthRoutes } from '../routes/auth.routes'
 import { useForm, Controller } from 'react-hook-form'
+import { api } from '../services/api'
+import { AppError } from '../utils/AppError'
 
 type TFormData = {
     name: string,
@@ -21,18 +23,18 @@ export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoute
     const onPressBackToSignIn = () => navigation.goBack()
 
     function onPressSignUp({ name, email, password } : TFormData) {
-        fetch('http://192.168.1.2:3333/users', {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, email, password })
-        }).catch(err => {
+        api.post('/users', { name, email, password })
+        .then(res => {
             toast.show({
-                title: 'Ops não foi possível criar sua conta',
+                title: 'Conta criada com sucesso',
+                bg:'green.500'
+            }) 
+        })
+        .catch(err => {
+            toast.show({
+                title: (err instanceof AppError) ? err.message : 'Não foi possível criar a conta, tente novamente mais tarde',
                 bg:'red.500'
-            })
+            }) 
         })
     }
 
