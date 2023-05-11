@@ -10,7 +10,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { api } from '../services/api'
 import { AppError } from '../utils/AppError'
 
-type TFormData = {
+type TSignUpFormData = {
     name: string,
     email: string,
     password: string
@@ -18,11 +18,15 @@ type TFormData = {
 
 export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoutes, "SIGN_UP_ROUTE">) {
     const toast = useToast()
-    const { control, handleSubmit, formState: { errors } } = useForm<TFormData>()
+    const { 
+        control, 
+        handleSubmit, 
+        formState: { errors, isSubmitting }
+     } = useForm<TSignUpFormData>()
 
     const onPressBackToSignIn = () => navigation.goBack()
 
-    function onPressSignUp({ name, email, password } : TFormData) {
+    function onPressSignUp({ name, email, password } : TSignUpFormData) {
         api.post('/users', { name, email, password })
         .then(res => {
             toast.show({
@@ -113,7 +117,7 @@ export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoute
                             />
                         )}
                     />
-                    <Button text="Criar minha conta" onPress={handleSubmit(onPressSignUp)}/>
+                    <Button text="Criar minha conta" onPress={handleSubmit(onPressSignUp)} disabled={isSubmitting}/>
                 </VStack>
 
                 <VStack space="5">
