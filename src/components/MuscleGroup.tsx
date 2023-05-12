@@ -18,7 +18,7 @@ export default function MuscleGroup({ groupName, isPressed, ...pressableNativePr
         {...pressableNativeProps}
        >
         <Text
-            color={isPressed ? "indigo.300" : "gray.400"}
+            color={isPressed ? "indigo.300" : "gray.400"} textTransform="uppercase"
         >{ groupName }</Text>
        </Pressable> 
     )
