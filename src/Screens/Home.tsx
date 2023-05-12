@@ -1,4 +1,4 @@
-import { VStack, FlatList, Text, HStack, Heading, useToast } from "native-base";
+import { VStack, FlatList, Text, HStack, Heading, useToast, Skeleton } from "native-base";
 import HeaderHome from "../components/HeaderHome";
 import MuscleGroup from "../components/MuscleGroup";
 import { useEffect, useState, useCallback } from "react";
@@ -8,6 +8,7 @@ import { AppError } from "../utils/AppError";
 import { useFocusEffect } from "@react-navigation/native";
 import { TExercise } from "../utils/types/ExerciseDTO";
 import Loading from '../components/Loading';
+import { IFlatListProps } from "native-base/lib/typescript/components/basic/FlatList";
 
 export default function Home() {
     const [muscleGroups, setMuscleGroups] = useState<string[]>([])
@@ -70,20 +71,21 @@ export default function Home() {
                 showsHorizontalScrollIndicator={false}
                 maxH="10"
             />
+
             {
                 loadingExercises
                 ?   <Loading />
-                :   <VStack space="5" px="5" flex={1} >
+                :   <VStack space="5" px="5" flex={1}>
                         <HStack justifyContent="space-between" alignItems="center">
                             <Heading color="gray.100" fontSize="lg">Exercícios</Heading>
                             <Text color="gray.400" fontSize="sm">{ exercises.length }</Text>
                         </HStack>
                         <FlatList 
                             showsVerticalScrollIndicator={false}
-                            _contentContainerStyle={{ pb: "10" }}
+                            _contentContainerStyle={{ pb: "10", gap: 2 } as Partial<IFlatListProps<TExercise>>}
                             data={exercises}
                             keyExtractor={ exercise => exercise.id }
-                            renderItem={({ item }) => <ExerciseCard />}
+                            renderItem={({ item: exercise }) => <ExerciseCard exercise={exercise}/>}
                         />
                     </VStack>
             }

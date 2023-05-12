@@ -17,7 +17,7 @@ export default function UserAvatar({size, loaded = true, avatarUri, ...imageNati
             w={size}
             rounded="full"
             startColor="gray.700"
-            endColor={"gray.600"}
+            endColor="gray.600"
         >
             <Image 
                 h={size}

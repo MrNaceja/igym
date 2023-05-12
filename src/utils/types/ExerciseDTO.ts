@@ -4,5 +4,6 @@ export type TExercise = {
     series: number,
     repetitions: string,
     group: string,
-    demo:string
+    demo:string,
+    thumb:string
 }
