@@ -3,10 +3,13 @@ import { SizeType } from "native-base/lib/typescript/components/types";
 
 interface UserAvatarProps extends IImageProps {
     size: SizeType,
-    loaded?: boolean
+    loaded?: boolean,
+    avatarUri: string
 }
 
-export default function UserAvatar({size, loaded = true, ...imageNativeProps} : UserAvatarProps) {
+import userAvatarDefault from '../assets/userAvatarDefault.png'
+
+export default function UserAvatar({size, loaded = true, avatarUri, ...imageNativeProps} : UserAvatarProps) {
     return (
         <Skeleton 
             isLoaded={loaded}
@@ -22,6 +25,7 @@ export default function UserAvatar({size, loaded = true, ...imageNativeProps} : 
                 rounded="full"
                 borderWidth="2"
                 borderColor="gray.600"
+                source={avatarUri ? {uri: avatarUri} : userAvatarDefault}
                 {...imageNativeProps}
             />
         </Skeleton>

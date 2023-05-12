@@ -8,6 +8,7 @@ export interface AuthContextProps {
     userStorageLoading: boolean,
     signIn: (userCredentials : TUserCredentials) => Promise<void>
     signUp: (userInformation : TUserInformation) => Promise<void>
+    signOut: () => Promise<void>
 }
 export const AuthContext = createContext<AuthContextProps>({} as AuthContextProps)
 
@@ -15,7 +16,7 @@ interface AuthContextProviderProps {
     children: ReactNode
 }
 export default function AuthContextProvider({ children } : AuthContextProviderProps) {
-    const [user, setUser] = useState<TUser>({ signed: false} as TUser)
+    const [user, setUser] = useState<TUser>({} as TUser)
     const [userStorageLoading, setUserStorageLoading] = useState(true)
 
     async function signIn(userCredentials : TUserCredentials) {
@@ -40,6 +41,20 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
         }
     }
 
+    async function signOut() {
+        try {
+            setUserStorageLoading(true) 
+            setUser({ signed: false } as TUser)
+            StorageUser.remove()
+        } 
+        catch (error) {
+            throw error
+        }
+        finally {
+            setUserStorageLoading(false)
+        }
+    }
+
     async function loadStoragedUser() {
         try {
             const userStoraged = await StorageUser.get()
@@ -59,7 +74,7 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
         loadStoragedUser()
     }, [])
     return (
-        <AuthContext.Provider value={{ user, userStorageLoading, signIn, signUp }}>
+        <AuthContext.Provider value={{ user, userStorageLoading, signIn, signUp, signOut }}>
             {children}
         </AuthContext.Provider>
     )

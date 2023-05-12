@@ -6,7 +6,10 @@ export const StorageUser = {
         await AsyncStorage.setItem(USER_STORAGE, JSON.stringify(user))
     },
     get: async () => {
-        const userLogged = await AsyncStorage.getItem(USER_STORAGE)
-        return (userLogged ? JSON.parse(userLogged) : { signed: false } ) as TUser
+        const userStoraged = await AsyncStorage.getItem(USER_STORAGE)
+        return (userStoraged ? JSON.parse(userStoraged) : { signed: false } ) as TUser
+    },
+    remove: async () => {
+        await AsyncStorage.removeItem(USER_STORAGE)
     }
 }
