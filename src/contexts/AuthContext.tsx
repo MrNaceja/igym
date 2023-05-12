@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useState, useEffect } from "react";
 import { TUser, TUserCredentials, TUserInformation } from '../utils/types/UserDTO';
 import { api } from "../services/api";
-import { StorageUser } from "../services/storage";
+import { StorageUser, StorageAuthToken } from "../services/storage";
 
 export interface AuthContextProps {
     user: TUser,
@@ -19,14 +19,33 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
     const [user, setUser] = useState<TUser>({} as TUser)
     const [userStorageLoading, setUserStorageLoading] = useState(true)
 
+    async function storageUserAuth(userLogged : TUser, token: string) {
+        try {
+            setUserStorageLoading(true)
+            await StorageUser.save(userLogged)
+            await StorageAuthToken.save(token)
+            authUserToken(userLogged, token)
+        } 
+        catch (error) {
+            throw error
+        }
+        finally {
+            setUserStorageLoading(false)
+        }
+    }
+
+    function authUserToken(userLogged : TUser, token : string) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        setUser(userLogged)
+    }
+
     async function signIn(userCredentials : TUserCredentials) {
         try {
            const { data } = await api.post('/sessions', userCredentials) 
-           if (data.user) {
+           if (data.user && data.token) {
                 const signedUser : TUser = data.user
                 signedUser.signed = true
-                setUser(signedUser)
-                StorageUser.save(signedUser)
+                storageUserAuth(signedUser, data.token)
            }
         } catch (error) {
             throw error
@@ -46,6 +65,7 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
             setUserStorageLoading(true) 
             setUser({ signed: false } as TUser)
             StorageUser.remove()
+            StorageAuthToken.remove()
         } 
         catch (error) {
             throw error
@@ -57,9 +77,11 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
 
     async function loadStoragedUser() {
         try {
+            setUserStorageLoading(true)
             const userStoraged = await StorageUser.get()
-            if (userStoraged) {
-                setUser(userStoraged)
+            const tokenStoraged = await StorageAuthToken.get()
+            if (userStoraged && tokenStoraged) {
+                authUserToken(userStoraged, tokenStoraged)
             } 
         } catch (error) {
             throw error
@@ -67,7 +89,6 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
         finally {
             setUserStorageLoading(false)
         }
-        
     }
 
     useEffect(() => {

@@ -19,7 +19,7 @@ type TSignUpFormData = {
 
 export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoutes, "SIGN_UP_ROUTE">) {
     const toast = useToast()
-    const { signUp } = useAuth()
+    const { signUp, signIn } = useAuth()
     const { 
         control, 
         handleSubmit, 
@@ -32,11 +32,12 @@ export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoute
 
     async function onPressSignUp({ name, email, password } : TSignUpFormData) {
         await signUp({ name, email, password })
-        .then(res => {
+        .then(async res => {
             toast.show({
                 title: 'Conta criada com sucesso',
                 bg:'green.500'
-            }) 
+            })
+            signIn({email, password}) 
         })
         .catch(error => {
             toast.show({
@@ -121,7 +122,7 @@ export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoute
                             />
                         )}
                     />
-                    <Button text="Criar minha conta" onPress={handleSubmit(onPressSignUp)} isLoading={isSubmitting}/>
+                    <Button text="Criar e acessar" onPress={handleSubmit(onPressSignUp)} isLoading={isSubmitting}/>
                 </VStack>
 
                 <VStack space="5">
