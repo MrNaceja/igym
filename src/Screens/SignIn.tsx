@@ -19,18 +19,20 @@ export default function SignIn({ navigation } : NativeStackScreenProps<TAuthRout
     const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<TSignInFormData>()
     const { signIn } = useAuth()
     const toast = useToast()
-    
+
     function onPressGoToSignUp() {
         navigation.navigate("SIGN_UP_ROUTE")
     }   
 
    async function onPressSignIn({ email, password } : TSignInFormData) {
-        await signIn({email, password}).catch(err => {
+        try {
+            await signIn({email, password})
+        } catch (error) {
             toast.show({
-                title: (err instanceof AppError) ? err.message : 'Não foi possível autenticar. Tente novamente mais tarde',
+                title: (error instanceof AppError) ? error.message : 'Não foi possível autenticar. Tente novamente mais tarde',
                 bg:'red.500'
-            }) 
-        })
+            })  
+        }
     }
 
     return (
@@ -89,7 +91,7 @@ export default function SignIn({ navigation } : NativeStackScreenProps<TAuthRout
                             />
                         )}
                     />
-                    <Button text="Acessar" onPress={handleSubmit(onPressSignIn)} isLoading={isSubmitting}/>
+                    <Button text="Acessar" onPress={handleSubmit(onPressSignIn)} isLoading={isSubmitting} />
                 </VStack>
 
                 <VStack space="5">
