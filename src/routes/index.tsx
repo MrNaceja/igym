@@ -3,6 +3,7 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import AuthRoutes from "./auth.routes";
 import { useTheme } from "native-base";
 import SignedRoutes from "./signed.routes";
+import AuthContextProvider from "../contexts/AuthContext";
 
 export default function Routes() {
 
@@ -13,7 +14,9 @@ export default function Routes() {
 
     return (
         <NavigationContainer theme={navigationTheme}>
-            <AuthRoutes />
+            <AuthContextProvider>
+                <AuthRoutes />
+            </AuthContextProvider>
         </NavigationContainer>
     )
 }

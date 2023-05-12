@@ -1,4 +1,4 @@
-import { VStack, Image, Center, Text, Heading, ScrollView } from 'native-base'
+import { VStack, Image, Center, Text, Heading, ScrollView, useToast } from 'native-base'
 
 import GymBackground from '../assets/bg_gym.png'
 import Logo from '../components/Logo'
@@ -7,6 +7,8 @@ import Button from '../components/Button'
 import { TAuthRoutes } from '../routes/auth.routes'
 import { NativeStackScreenProps } from '@react-navigation/native-stack/lib/typescript/src/types'
 import { useForm, Controller } from 'react-hook-form'
+import useAuth from '../hooks/useAuth'
+import { AppError } from '../utils/AppError'
 
 type TSignInFormData = {
     email: string,
@@ -14,13 +16,21 @@ type TSignInFormData = {
 }
 
 export default function SignIn({ navigation } : NativeStackScreenProps<TAuthRoutes, "SIGN_IN_ROUTE">) {
+    const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<TSignInFormData>()
+    const { signIn } = useAuth()
+    const toast = useToast()
+    
+    function onPressGoToSignUp() {
+        navigation.navigate("SIGN_UP_ROUTE")
+    }   
 
-    const { control, handleSubmit, formState: { errors } } = useForm<TSignInFormData>()
-
-    const onPressGoToSignUp = () => navigation.navigate("SIGN_UP_ROUTE")
-
-    function onPressSignIn({ email, password } : TSignInFormData) {
-
+   async function onPressSignIn({ email, password } : TSignInFormData) {
+        await signIn({email, password}).catch(err => {
+            toast.show({
+                title: (err instanceof AppError) ? err.message : 'Não foi possível autenticar. Tente novamente mais tarde',
+                bg:'red.500'
+            }) 
+        })
     }
 
     return (
@@ -79,7 +89,7 @@ export default function SignIn({ navigation } : NativeStackScreenProps<TAuthRout
                             />
                         )}
                     />
-                    <Button text="Acessar" onPress={handleSubmit(onPressSignIn)}/>
+                    <Button text="Acessar" onPress={handleSubmit(onPressSignIn)} isLoading={isSubmitting}/>
                 </VStack>
 
                 <VStack space="5">
