@@ -8,12 +8,17 @@ import History from "../Screens/History";
 import Profile from "../Screens/Profile";
 import Exercise from "../Screens/Exercise";
 
+export type TExerciseRouteParams = {
+    exerciseId: string
+}
+
 export type TSignedRoutes = {
     HOME_ROUTE: undefined,
     HISTORY_ROUTE: undefined,
     PROFILE_ROUTE: undefined,
-    EXERCISE_ROUTE: undefined
+    EXERCISE_ROUTE: TExerciseRouteParams
 }
+
 export type TSignedNavigationRoutesProps = BottomTabNavigationProp<TSignedRoutes>
 
 const { Navigator, Screen } = createBottomTabNavigator<TSignedRoutes>()

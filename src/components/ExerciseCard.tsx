@@ -15,7 +15,7 @@ export default function ExerciseCard({ exercise } : ExerciseCardProps) {
     const screenNavigator = useNavigation<TSignedNavigationRoutesProps>()
     
     function onPressOpenExercise() {
-        screenNavigator.navigate("EXERCISE_ROUTE")
+        screenNavigator.navigate("EXERCISE_ROUTE", { exerciseId: exercise.id })
     }
 
     return (
