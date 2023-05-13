@@ -15,6 +15,7 @@ import Loading from '../components/Loading';
 export default function Exercise({ route : { params : { exerciseId } }, navigation } : NativeStackScreenProps<TSignedRoutes, 'EXERCISE_ROUTE'>) {
     const [exercise, setExercise] = useState<TExercise>({} as TExercise)
     const [loadingExerciseDetails, setLoadingExerciseDetails] = useState(true)
+    const [registeringHistory, setRegisteringHistory] = useState(false)
     const toast = useToast()
 
     async function loadExerciseDetails() {
@@ -32,6 +33,25 @@ export default function Exercise({ route : { params : { exerciseId } }, navigati
         .finally(() => {
             setLoadingExerciseDetails(false)
         })
+    }
+
+    async function registerExerciseHistory() {
+        setRegisteringHistory(true)
+        api.post('/history', { exercise_id: exercise.id })
+        .then(res => {
+            toast.show({
+                bg: "indigo.500",
+                title: 'Exercício realizado, veja-o em seu histórico'
+            })
+            navigation.navigate("HISTORY_ROUTE")
+        })
+        .catch(error => {
+            toast.show({
+                bg:"red.500",
+                title: error instanceof AppError ? error.message : 'Ops, não foi possível registrar o exercício no histórico',
+            })
+        })
+        .finally(() => setRegisteringHistory(false))
     }
 
     useEffect(() => {
@@ -83,7 +103,7 @@ export default function Exercise({ route : { params : { exerciseId } }, navigati
                                 <Text ml="3" color="gray.400">{exercise.repetitions} repetições</Text>
                             </Box>
                         </HStack>
-                        <Button text="Marcar como realizado"/>
+                        <Button text="Marcar como realizado" isLoading={registeringHistory} onPress={registerExerciseHistory}/>
                     </VStack>
                 </VStack>
             </VStack>

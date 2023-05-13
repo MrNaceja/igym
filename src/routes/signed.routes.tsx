@@ -48,7 +48,7 @@ export default function SignedRoutes() {
                         fontSize: fontSizes.md
                     }
                 }}
-            />
+            /> 
             <Screen 
                 name="HISTORY_ROUTE"
                 component={History}
