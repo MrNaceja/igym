@@ -1,13 +1,17 @@
-import { VStack, Image, Center, Text, Heading, ScrollView, useToast } from 'native-base'
+import { useForm, Controller } from 'react-hook-form'
+import useAuth from '../hooks/useAuth'
+import useToastAlert from '../hooks/useToastAlert'
+
+import { VStack, Image, Center, Text, Heading, ScrollView } from 'native-base'
+import { NativeStackScreenProps } from '@react-navigation/native-stack/lib/typescript/src/types'
 
 import GymBackground from '../assets/bg_gym.png'
+
 import Logo from '../components/Logo'
 import Input from '../components/Input'
 import Button from '../components/Button'
+
 import { TAuthRoutes } from '../routes/auth.routes'
-import { NativeStackScreenProps } from '@react-navigation/native-stack/lib/typescript/src/types'
-import { useForm, Controller } from 'react-hook-form'
-import useAuth from '../hooks/useAuth'
 import { AppError } from '../utils/AppError'
 
 type TSignInFormData = {
@@ -18,7 +22,7 @@ type TSignInFormData = {
 export default function SignIn({ navigation } : NativeStackScreenProps<TAuthRoutes, "SIGN_IN_ROUTE">) {
     const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<TSignInFormData>()
     const { signIn } = useAuth()
-    const toast = useToast()
+    const AlertToast = useToastAlert()
 
     function onPressGoToSignUp() {
         navigation.navigate("SIGN_UP_ROUTE")
@@ -28,10 +32,7 @@ export default function SignIn({ navigation } : NativeStackScreenProps<TAuthRout
         try {
             await signIn({email, password})
         } catch (error) {
-            toast.show({
-                title: (error instanceof AppError) ? error.message : 'Não foi possível autenticar. Tente novamente mais tarde',
-                bg:'red.500'
-            })  
+            AlertToast.error({ title: error instanceof AppError ? error.message : 'Não foi possível autenticar. Tente novamente mais tarde' })
         }
     }
 

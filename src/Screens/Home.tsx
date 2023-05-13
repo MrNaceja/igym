@@ -1,14 +1,19 @@
-import { VStack, FlatList, Text, HStack, Heading, useToast, Skeleton } from "native-base";
+import { useEffect, useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import useToastAlert from "../hooks/useToastAlert";
+
+import { VStack, FlatList, Text, HStack, Heading } from "native-base";
+import { IFlatListProps } from "native-base/lib/typescript/components/basic/FlatList";
+
 import HeaderHome from "../components/HeaderHome";
 import MuscleGroup from "../components/MuscleGroup";
-import { useEffect, useState, useCallback } from "react";
 import ExerciseCard from "../components/ExerciseCard";
-import { api } from "../services/api";
-import { AppError } from "../utils/AppError";
-import { useFocusEffect } from "@react-navigation/native";
-import { TExercise } from "../utils/types/ExerciseDTO";
 import Loading from '../components/Loading';
-import { IFlatListProps } from "native-base/lib/typescript/components/basic/FlatList";
+
+import { api } from "../services/api";
+
+import { AppError } from "../utils/AppError";
+import { TExercise } from "../utils/types/ExerciseDTO";
 
 export default function Home() {
     const [muscleGroups, setMuscleGroups] = useState<string[]>([])
@@ -16,7 +21,7 @@ export default function Home() {
     const [muscleGroupActive, setMuscleGroupActive] = useState<string>('')
     const [loadingExercises, setLoadingExercises] = useState(true)
 
-    const toast = useToast()
+    const AlertToast = useToastAlert()
 
     async function loadMuscleGroups() {
         api.get('/groups')
@@ -25,10 +30,7 @@ export default function Home() {
             setMuscleGroupActive(res.data[0])
         })
         .catch(error => {
-            toast.show({
-                title: error instanceof AppError ? error.message : 'Ops, não foi possível carregar os grupos musculares',
-                placement: "top"
-            })
+            AlertToast.error({ title: error instanceof AppError ? error.message : 'Ops, não foi possível carregar os grupos musculares' })
         })
     }
 
@@ -39,10 +41,7 @@ export default function Home() {
             setExercises(res.data)
         })
         .catch(error => {
-            toast.show({
-                title: error instanceof AppError ? error.message : 'Ops, não foi possível carregar os exercicios',
-                placement: "top"
-            })
+            AlertToast.error({ title: error instanceof AppError ? error.message : 'Ops, não foi possível carregar os exercicios' })
         })
         .finally(() => setLoadingExercises(false))
     }

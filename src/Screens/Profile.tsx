@@ -1,19 +1,21 @@
 import { useState } from "react";
-import { Pressable, ScrollView, VStack, Text, Heading, IScrollViewProps, useToast } from "native-base";
+import useToastAlert from "../hooks/useToastAlert";
+
+import { Pressable, ScrollView, VStack, Text, Heading, IScrollViewProps } from "native-base";
+
 import HeaderScreen from "../components/HeaderScreen";
 import UserAvatar from "../components/UserAvatar";
 import Input from "../components/Input";
 import Button from "../components/Button";
-import { Alert } from 'react-native'
 
 import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system';
 
-
 export default function Profile() {
     const [userAvatarProfile, setUserAvatarProfile] = useState('https://github.com/MrNaceja.png')
     const [userAvatarLoaded, setUserAvatarLoaded]   = useState(true)
-    const toast = useToast()
+    
+    const AlertToast = useToastAlert()
 
     function onPressOpenImageGallery() {
         setUserAvatarLoaded(false)
@@ -44,7 +46,7 @@ export default function Profile() {
             if (imageSelectedInfo.exists) {
                 const imageSize = imageSelectedInfo.size / 1024 / 1024
                 if (imageSize > 3) {
-                    return toast.show({
+                    return AlertToast.error({
                         title: "Imagem muito grande!",
                         description: "Por favor selecione uma imagem de até 3MB",
                         placement: "top",
@@ -56,7 +58,7 @@ export default function Profile() {
                 }
             }
             setUserAvatarProfile(imageSelected)
-            return toast.show({
+            return AlertToast.sucess({
                 title: "Imagem alterada com sucesso",
                 placement: "top",
                 bg: "indigo.500"
@@ -70,7 +72,7 @@ export default function Profile() {
             <ScrollView  _contentContainerStyle={{ p: "5", gap: 5 } as Partial<IScrollViewProps>}>
                 <VStack space="2" alignItems="center" px="24">
                     <UserAvatar 
-                        source={{ uri: userAvatarProfile }}
+                        avatarUri={userAvatarProfile}
                         alt="Avatar do Usuário"
                         size="32"
                         loaded={userAvatarLoaded}

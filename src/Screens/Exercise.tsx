@@ -1,22 +1,28 @@
-import { Box, HStack, Icon, Image, VStack, Text, Divider, useToast } from "native-base";
+import { useState, useEffect } from 'react';
+import useToastAlert from "../hooks/useToastAlert";
+
 import HeaderScreen from "../components/HeaderScreen";
-import { Ionicons } from '@expo/vector-icons'
 import Button from "../components/Button";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { TSignedRoutes } from '../routes/signed.routes';
-import { api } from "../services/api";
-import { AppError } from "../utils/AppError";
-import { useState } from 'react';
-import { TExercise } from "../utils/types/ExerciseDTO";
-import { useEffect } from 'react';
 import Loading from '../components/Loading';
+
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+import { Box, HStack, Icon, Image, VStack, Text, Divider } from "native-base";
+import { Ionicons } from '@expo/vector-icons'
+
+import { TSignedRoutes } from '../routes/signed.routes';
+
+import { api } from "../services/api";
+
+import { AppError } from "../utils/AppError";
+import { TExercise } from "../utils/types/ExerciseDTO";
 
 
 export default function Exercise({ route : { params : { exerciseId } }, navigation } : NativeStackScreenProps<TSignedRoutes, 'EXERCISE_ROUTE'>) {
     const [exercise, setExercise] = useState<TExercise>({} as TExercise)
     const [loadingExerciseDetails, setLoadingExerciseDetails] = useState(true)
     const [registeringHistory, setRegisteringHistory] = useState(false)
-    const toast = useToast()
+    const AlertToast = useToastAlert()
 
     async function loadExerciseDetails() {
         setLoadingExerciseDetails(true)
@@ -39,17 +45,11 @@ export default function Exercise({ route : { params : { exerciseId } }, navigati
         setRegisteringHistory(true)
         api.post('/history', { exercise_id: exercise.id })
         .then(res => {
-            toast.show({
-                bg: "indigo.500",
-                title: 'Exercício realizado, veja-o em seu histórico'
-            })
+            AlertToast.sucess({ title: 'Exercício realizado, veja-o em seu histórico' })
             navigation.navigate("HISTORY_ROUTE")
         })
         .catch(error => {
-            toast.show({
-                bg:"red.500",
-                title: error instanceof AppError ? error.message : 'Ops, não foi possível registrar o exercício no histórico',
-            })
+            AlertToast.error({ title: error instanceof AppError ? error.message : 'Ops, não foi possível registrar o exercício no histórico' })
         })
         .finally(() => setRegisteringHistory(false))
     }
@@ -59,8 +59,8 @@ export default function Exercise({ route : { params : { exerciseId } }, navigati
     }, [exerciseId])
     return (
         loadingExerciseDetails
-         ? <Loading />
-         :  <VStack flex={1} space="5" pb="5">
+        ?   <Loading />
+        :   <VStack flex={1} space="5" pb="5">
                 <HeaderScreen title={exercise.name} description={exercise.group.toUpperCase()} showBackButton />
                 <VStack 
                     p="3" 

@@ -1,15 +1,18 @@
-import { VStack, Image, Center, Text, Heading, ScrollView, useToast, IToastProps } from 'native-base'
+import { useForm, Controller } from 'react-hook-form'
+import useAuth from '../hooks/useAuth'
+import useToastAlert from '../hooks/useToastAlert'
+
+import { VStack, Image, Center, Text, Heading, ScrollView } from 'native-base'
 
 import GymBackground from '../assets/bg_gym.png'
+
 import Logo from '../components/Logo'
 import Input from '../components/Input'
 import Button from '../components/Button'
+
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { TAuthRoutes } from '../routes/auth.routes'
-import { useForm, Controller } from 'react-hook-form'
-import { api } from '../services/api'
 import { AppError } from '../utils/AppError'
-import useAuth from '../hooks/useAuth'
 
 type TSignUpFormData = {
     name: string,
@@ -18,7 +21,7 @@ type TSignUpFormData = {
 }
 
 export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoutes, "SIGN_UP_ROUTE">) {
-    const toast = useToast()
+    const AlertToast = useToastAlert()
     const { signUp, signIn } = useAuth()
     const { 
         control, 
@@ -33,17 +36,11 @@ export default function SignUp({ navigation }: NativeStackScreenProps<TAuthRoute
     async function onPressSignUp({ name, email, password } : TSignUpFormData) {
         await signUp({ name, email, password })
         .then(async res => {
-            toast.show({
-                title: 'Conta criada com sucesso',
-                bg:'green.500'
-            })
+            AlertToast.sucess({ title: 'Conta criada com sucesso' })
             signIn({email, password}) 
         })
         .catch(error => {
-            toast.show({
-                title: (error instanceof AppError) ? error.message : 'Não foi possível criar a conta, tente novamente mais tarde',
-                bg:'red.500'
-            }) 
+            AlertToast.error({ title: error instanceof AppError ? error.message : 'Não foi possível criar a conta, tente novamente mais tarde' })
         })
     }
 
