@@ -3,6 +3,7 @@ import UserAvatar from "./UserAvatar";
 import { Alert, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons'
 import useAuth from "../hooks/useAuth";
+import { api } from "../services/api";
 
 export default function HeaderHome() {
     const { user: { name, avatar }, signOut } = useAuth()
@@ -30,7 +31,7 @@ export default function HeaderHome() {
         >
             <HStack space="4" alignItems="center">
                 <UserAvatar 
-                    avatarUri={avatar}
+                    avatarUri={`${api.defaults.baseURL}/avatar/${avatar}`}
                     alt="Avatar do Usuário"
                     size={16}
                 />

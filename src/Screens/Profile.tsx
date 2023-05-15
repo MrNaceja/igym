@@ -14,6 +14,7 @@ import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system';
 import { api } from "../services/api";
 import { AppError } from "../utils/AppError";
+import { TUser } from "../utils/types/UserDTO";
 
 
 type TProfileFormData = {
@@ -24,10 +25,9 @@ type TProfileFormData = {
 }
 
 export default function Profile() {
-    const [userAvatarProfile, setUserAvatarProfile] = useState('https://github.com/MrNaceja.png')
-    const [userAvatarLoaded, setUserAvatarLoaded]   = useState(true)
+    const [userAvatarLoaded, setUserAvatarLoaded] = useState(true)
 
-    const { user } = useAuth()
+    const { user, updateUserProfile } = useAuth()
 
     const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<TProfileFormData>({
         defaultValues: {
@@ -43,7 +43,10 @@ export default function Profile() {
         try {
             changeUserAvatarImage()
         } catch (error) {
-            console.log(error)
+            AlertToast.error({
+                placement: 'top',
+                title: error instanceof AppError ? error.message : 'Não foi possível atualizar a foto de perfil'
+            })
         }
         finally{
             setUserAvatarLoaded(true)
@@ -51,9 +54,13 @@ export default function Profile() {
     }
 
     async function onPressSaveProfile({ name, password, newPassword }: TProfileFormData) {
-        api.put('/users', {name, old_password: password, password: newPassword})
-        .then(res => AlertToast.sucess({ title: 'Uau seu perfil ficou ótimo', placement: 'top' }))
-        .catch(error => AlertToast.error({ title: error instanceof AppError ? error.message : 'Ops, não foi possível atualiza seu perfil' }))
+        await api.put('/users', {name, old_password: password, password: newPassword})
+                .then(res => {
+                    updateUserProfile({...user, name} as TUser)
+                    .then(()  => AlertToast.sucess({ title: 'Seu perfil foi atualizado com sucesso', placement: 'top' }))
+                    .catch(() => AlertToast.error({ title: 'Ocorreu um problema inesperado ao salvar a atualização de perfil'}))
+                })
+                .catch(error => AlertToast.error({ title: error instanceof AppError ? error.message : 'Ops, não foi possível atualiza seu perfil' }))
     }
 
     async function changeUserAvatarImage() {
@@ -84,12 +91,31 @@ export default function Profile() {
                     })
                 }
             }
-            setUserAvatarProfile(imageSelected)
-            return AlertToast.sucess({
-                title: "Imagem alterada com sucesso",
-                placement: "top",
-                bg: "indigo.500"
-            })
+            const imageExtension = imageSelected.split('.').pop()
+            const imageFileToUpload = {
+                name: `${user.name}.${imageExtension}`.toLowerCase(),
+                uri: imageSelectedInfo.uri,
+                type: `image/${imageExtension}`
+            } as any
+            
+            const imageForm = new FormData()
+            imageForm.append('avatar', imageFileToUpload)
+
+            await api.patch('/users/avatar', imageForm, { headers: { 'Content-Type': 'multipart/form-data' } })
+                .then(async res => {
+                    await updateUserProfile({...user, avatar: res.data.avatar})
+                        .then(() => AlertToast.sucess({
+                            title: "Imagem alterada com sucesso",
+                            placement: "top",
+                            bg: "indigo.500"
+                        }))
+                        .catch(error => {
+                            throw error
+                        })
+                })
+                .catch(error => {
+                    throw error
+                })
         }
     }
 
@@ -99,7 +125,7 @@ export default function Profile() {
             <ScrollView  _contentContainerStyle={{ p: "5", gap: 5 } as Partial<IScrollViewProps>}>
                 <VStack space="2" alignItems="center" px="24">
                     <UserAvatar 
-                        avatarUri={user.avatar}
+                        avatarUri={`${api.defaults.baseURL}/avatar/${user.avatar}`}
                         alt="Avatar do Usuário"
                         size="32"
                         loaded={userAvatarLoaded}

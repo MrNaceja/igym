@@ -25,10 +25,10 @@ export default function ExerciseCard({ exercise } : ExerciseCardProps) {
                     source={{ uri: `${api.defaults.baseURL}/exercise/thumb/${exercise.thumb}` }}
                     alt="Exerício"
                     h="full"
-                    w="16"
+                    w="20"
                     resizeMode="cover"
                 />
-                <HStack p="3" flex={1} justifyContent="space-between" alignItems="center">
+                <HStack p="5" flex={1} justifyContent="space-between" alignItems="center">
                     <VStack>
                         <Heading color="gray.100" numberOfLines={1} fontSize="lg">{ exercise.name }</Heading>
                         <Text color="gray.400" numberOfLines={2}>

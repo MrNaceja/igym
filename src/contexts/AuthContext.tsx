@@ -6,9 +6,10 @@ import { StorageUser, StorageAuthToken } from "../services/storage";
 export interface AuthContextProps {
     user: TUser,
     userStorageLoading: boolean,
-    signIn: (userCredentials : TUserCredentials) => Promise<void>
-    signUp: (userInformation : TUserInformation) => Promise<void>
-    signOut: () => Promise<void>
+    signIn:            (userCredentials : TUserCredentials) => Promise<void>
+    signUp:            (userInformation : TUserInformation) => Promise<void>
+    updateUserProfile: (userUpdated: TUser)                 => Promise<void>
+    signOut: () => Promise<void>,
 }
 export const AuthContext = createContext<AuthContextProps>({} as AuthContextProps)
 
@@ -18,6 +19,11 @@ interface AuthContextProviderProps {
 export default function AuthContextProvider({ children } : AuthContextProviderProps) {
     const [user, setUser] = useState<TUser>({} as TUser)
     const [userStorageLoading, setUserStorageLoading] = useState(true)
+
+    function authUserToken(userLogged : TUser, token : string) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        setUser(userLogged)
+    }
 
     async function storageUserAuth(userLogged : TUser, token: string) {
         try {
@@ -32,11 +38,6 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
         finally {
             setUserStorageLoading(false)
         }
-    }
-
-    function authUserToken(userLogged : TUser, token : string) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        setUser(userLogged)
     }
 
     async function signIn(userCredentials : TUserCredentials) {
@@ -91,11 +92,24 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
         }
     }
 
+    async function updateUserProfile(userUpdated : TUser) {
+        try {
+            setUserStorageLoading(true)
+            setUser(userUpdated)
+            StorageUser.save(userUpdated)
+        } catch (error) {
+            throw error
+        }
+        finally {
+            setUserStorageLoading(false)
+        }
+    }
+
     useEffect(() => {
         loadStoragedUser()
     }, [])
     return (
-        <AuthContext.Provider value={{ user, userStorageLoading, signIn, signUp, signOut }}>
+        <AuthContext.Provider value={{ user, userStorageLoading, updateUserProfile, signIn, signUp, signOut }}>
             {children}
         </AuthContext.Provider>
     )
