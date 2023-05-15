@@ -1,4 +1,6 @@
 import { useState } from "react";
+import useAuth from '../hooks/useAuth';
+import { useForm, Controller } from "react-hook-form";
 import useToastAlert from "../hooks/useToastAlert";
 
 import { Pressable, ScrollView, VStack, Text, Heading, IScrollViewProps } from "native-base";
@@ -10,10 +12,29 @@ import Button from "../components/Button";
 
 import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system';
+import { api } from "../services/api";
+import { AppError } from "../utils/AppError";
+
+
+type TProfileFormData = {
+    name: string,
+    email: string,
+    password: string,
+    newPassword: string
+}
 
 export default function Profile() {
     const [userAvatarProfile, setUserAvatarProfile] = useState('https://github.com/MrNaceja.png')
     const [userAvatarLoaded, setUserAvatarLoaded]   = useState(true)
+
+    const { user } = useAuth()
+
+    const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<TProfileFormData>({
+        defaultValues: {
+            name: user.name,
+            email: user.email,
+        }
+    })
     
     const AlertToast = useToastAlert()
 
@@ -27,6 +48,12 @@ export default function Profile() {
         finally{
             setUserAvatarLoaded(true)
         }
+    }
+
+    async function onPressSaveProfile({ name, password, newPassword }: TProfileFormData) {
+        api.put('/users', {name, old_password: password, password: newPassword})
+        .then(res => AlertToast.sucess({ title: 'Uau seu perfil ficou ótimo', placement: 'top' }))
+        .catch(error => AlertToast.error({ title: error instanceof AppError ? error.message : 'Ops, não foi possível atualiza seu perfil' }))
     }
 
     async function changeUserAvatarImage() {
@@ -72,7 +99,7 @@ export default function Profile() {
             <ScrollView  _contentContainerStyle={{ p: "5", gap: 5 } as Partial<IScrollViewProps>}>
                 <VStack space="2" alignItems="center" px="24">
                     <UserAvatar 
-                        avatarUri={userAvatarProfile}
+                        avatarUri={user.avatar}
                         alt="Avatar do Usuário"
                         size="32"
                         loaded={userAvatarLoaded}
@@ -91,31 +118,68 @@ export default function Profile() {
                 </VStack>
                 
                 <VStack space="3">
-                    <Input 
-                        placeholder="seu nome"
+                    <Controller 
+                        control={control}
+                        name="name"
+                        rules={{ required: 'Ops, precisamos do seu nome' }}
+                        render={({ field: { value, onChange } }) => (
+                            <Input 
+                                placeholder="seu nome"
+                                onChangeText={onChange}
+                                value={value}
+                                invalidMessage={errors.name?.message}
+                            />
+                        )}
                     />
-                    <Input 
-                        placeholder="seu email"
-                        isDisabled
+                    <Controller 
+                        control={control}
+                        name="email"
+                        render={({ field: { value, onChange } }) => (
+                            <Input 
+                                placeholder="seu email"
+                                isDisabled
+                                isReadOnly
+                                onChangeText={onChange}
+                                value={value}
+                            />
+                        )}
                     />
                 </VStack>
 
                 <VStack space="3" mt="8">
                     <Heading color="gray.400" fontSize="lg">Alteração de senha</Heading>
-                    <Input 
-                        placeholder="senha antiga"
-                        secureTextEntry
+                    <Controller 
+                        control={control}
+                        name="password"
+                        render={({ field: { onChange } }) => (
+                            <Input 
+                                placeholder="senha antiga"
+                                secureTextEntry
+                                onChangeText={onChange}
+                                invalidMessage={errors.password?.message}
+                            />
+                        )}
                     />
-                    <Input 
-                        placeholder="nova senha"
-                        secureTextEntry
-                    />
-                    <Input 
-                        placeholder="confirmar a nova senha"
-                        secureTextEntry
+                    <Controller 
+                        control={control}
+                        name="newPassword"
+                        rules={{
+                            minLength: {
+                                value: 5,
+                                message: 'Ops, a nova senha deve ter pelo menos 5 caracteres'
+                            }
+                        }}
+                        render={({ field: { onChange } }) => (
+                            <Input 
+                                placeholder="nova senha"
+                                secureTextEntry
+                                onChangeText={onChange}
+                                invalidMessage={errors.newPassword?.message}
+                            />
+                        )}
                     />
                 </VStack>
-                <Button text="Salvar"/>
+                <Button text="Salvar" onPress={handleSubmit(onPressSaveProfile)} isLoading={isSubmitting}/>
             </ScrollView>
         </VStack>
     )
