@@ -108,6 +108,10 @@ export default function AuthContextProvider({ children } : AuthContextProviderPr
     useEffect(() => {
         loadStoragedUser()
     }, [])
+    useEffect(() => {
+        const subscribe = api.interceptTokenManager(signOut)
+        return () => subscribe()
+    }, [signOut])
     return (
         <AuthContext.Provider value={{ user, userStorageLoading, updateUserProfile, signIn, signUp, signOut }}>
             {children}
